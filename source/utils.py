@@ -3,9 +3,20 @@ This code defines some functions for use with the Mega command line interface.
 """
 
 # Standard imports.
+import shutil
 import subprocess
+from enum import Enum
 from getpass import getpass
 from pathlib import Path
+
+#########
+# ENUMS #
+#########
+
+class GetReturnCode(Enum):
+    FAILURE = 0
+    SUCCESS = 1
+    PRESENT = 2
 
 #############
 # FUNCTIONS #
@@ -21,20 +32,6 @@ def run_mega_command(second_half, args=None):
     except subprocess.CalledProcessError:
         return False
     return True
-
-def run_mega_command_and_return_output(second_half, args=None):
-    """ Run a shell command beginning with `mega-`, and capture the output. """
-    commands = ["mega-"+second_half]
-    success = True
-    output = None
-    if args:
-        commands += args
-    try:
-        process = subprocess.run(commands, check=True, capture_output=True)
-        output = process.stdout
-    except subprocess.CalledProcessError:
-        success = False
-    return success, output
 
 def report(success):
     """ Report on whether a given Mega command succeeded or not. """
@@ -71,12 +68,56 @@ def mega_sync(local_path: str, remote_path: str) -> bool:
     report(success)
     return success
 
-def mega_get(url: str, local_path: str) -> bool:
-    """ Download a file at the above URL to the above local path. """
-    if Path(local_path).exists():
-        print(local_path+" already exists.")
-        return True
-    print("Dowloading to "+local_path+"...")
-    success = run_mega_command("get", [url, local_path])
+def get_yes_no(message):
+    """ Get the user to answer a yes/no question. """
+    valid = {"yes": True, "y": True, "no": False, "n": False}
+    print(message+" [y/n]")
+    answer = input().lower()
+    if answer in valid:
+        return valid[answer]
+    return False
+
+def mega_get_dir(
+        url_or_path: str,
+        local_path: str,
+        auto_delete: bool = False,
+        auto_keep: bool = False
+    ) -> GetReturnCode:
+    """ Download a directory at the above URL or remote path to the above local
+    path. """
+    local_path_obj = Path(local_path)
+    if local_path_obj.exists():
+        message = (
+            "In order to download "+
+            url_or_path+
+            " to "+
+            local_path+
+            ", I will need to delete the existing local version. Do you "+
+            "wish to proceed?"
+        )
+        if auto_keep:
+            return GetReturnCode.PRESENT
+        if auto_delete or get_yes_no(message):
+            print("Deleting...")
+            shutil.rmtree(local_path)
+        else:
+            return GetReturnCode.PRESENT
+    local_path_obj.mkdir(parents=True)
+    success = run_mega_command("get", ["-m", url_or_path, local_path])
     report(success)
-    return success
+    if success:
+        return GetReturnCode.SUCCESS
+    return GetReturnCode.FAILURE
+
+def mega_get(url_or_path: str, local_path: str) -> GetReturnCode:
+    """ Download a file at the above URL or remote path to the above local
+    path. """
+    local_path_obj = Path(local_path)
+    if local_path_obj.exists():
+        print(local_path+" already exists.")
+        return GetReturnCode.PRESENT
+    success = run_mega_command("get", [url_or_path, local_path])
+    report(success)
+    if success:
+        return GetReturnCode.SUCCESS
+    return GetReturnCode.FAILURE
