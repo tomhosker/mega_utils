@@ -9,11 +9,15 @@ from enum import Enum
 from getpass import getpass
 from pathlib import Path
 
+# Non-standard imports.
+from hosker_utils import get_yes_no
+
 #########
 # ENUMS #
 #########
 
 class GetReturnCode(Enum):
+    """ Return codes for any functions which call `mega-get`. """
     FAILURE = 0
     SUCCESS = 1
     PRESENT = 2
@@ -67,15 +71,6 @@ def mega_sync(local_path: str, remote_path: str) -> bool:
     success = run_mega_command("sync", [local_path, remote_path])
     report(success)
     return success
-
-def get_yes_no(message):
-    """ Get the user to answer a yes/no question. """
-    valid = {"yes": True, "y": True, "no": False, "n": False}
-    print(message+" [y/n]")
-    answer = input().lower()
-    if answer in valid:
-        return valid[answer]
-    return False
 
 def mega_get_dir(
         url_or_path: str,
