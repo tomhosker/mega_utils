@@ -32,10 +32,11 @@ def run_mega_command(second_half, args=None, quiet=True):
     local_stdout = subprocess.STDOUT
     if args:
         commands += args
-    if quiet:
-        local_stdout = subprocess.DEVNULL
     try:
-        subprocess.run(commands, check=True, stdout=local_stdout)
+        if quiet:
+            subprocess.run(commands, check=True, stdout=subprocess.DEVNULL)
+        else:
+            subprocess.run(commands, check=True)
     except subprocess.CalledProcessError:
         return False
     return True

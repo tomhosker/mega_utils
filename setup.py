@@ -7,7 +7,7 @@ from setuptools import setup
 
 # Local constants.
 PACKAGE_NAME = "mega_utils"
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 DESCRIPTION = "Utility functions for the Mega cloud storage service"
 GIT_URL_STEM = "https://github.com/tomhosker"
 AUTHOR = "Tom Hosker"
