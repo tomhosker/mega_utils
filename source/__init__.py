@@ -4,4 +4,4 @@ storage service.
 """
 
 # Local imports.
-from .utils import mega_login, mega_logout, mega_sync, mega_get, mega_get_dir
+from .utils import mega_log_in, mega_log_out, mega_sync, mega_get, mega_get_dir

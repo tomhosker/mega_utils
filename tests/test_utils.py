@@ -10,8 +10,8 @@ from unittest.mock import Mock, patch
 # Source imports.
 from source.utils import (
     GetReturnCode,
-    mega_login,
-    mega_logout,
+    mega_log_in,
+    mega_log_out,
     mega_sync,
     mega_get_dir,
     mega_get
@@ -23,14 +23,14 @@ from source.utils import (
 
 @patch("source.utils.getpass", Mock(return_value="password"))
 @patch("source.utils.run_mega_command", Mock(return_value=True))
-def test_mega_login():
+def test_mega_log_in():
     """ Test the function runs. """
-    assert mega_login("username")
+    assert mega_log_in("username")
 
 @patch("source.utils.run_mega_command", Mock(return_value=True))
-def test_mega_logout():
+def test_mega_log_out():
     """ Test the function runs. """
-    assert mega_logout()
+    assert mega_log_out()
 
 @patch("source.utils.run_mega_command", Mock(return_value=True))
 def test_mega_sync():

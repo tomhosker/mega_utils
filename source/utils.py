@@ -40,12 +40,12 @@ def run_mega_command(second_half, args=None, quiet=True):
         return False
     return True
 
-def mega_login(username: str, quiet: bool = True) -> bool:
+def mega_log_in(username: str, quiet: bool = True) -> bool:
     """ Ronseal. """
     password = getpass(prompt="Enter your Mega password to log in: ")
     return run_mega_command("login", [username, password], quiet=quiet)
 
-def mega_logout(quiet: bool = True) -> bool:
+def mega_log_out(quiet: bool = True) -> bool:
     """ Ronseal. """
     return run_mega_command("logout", quiet=quiet)
 
