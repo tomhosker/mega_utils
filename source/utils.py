@@ -5,6 +5,7 @@ This code defines some functions for use with the Mega command line interface.
 # Standard imports.
 import shutil
 import subprocess
+import traceback
 from enum import Enum
 from getpass import getpass
 from pathlib import Path
@@ -38,6 +39,8 @@ def run_mega_command(second_half, args=None, quiet=True):
         else:
             subprocess.run(commands, check=True)
     except subprocess.CalledProcessError:
+        if not quiet:
+            traceback.print_exc()
         return False
     return True
 
@@ -99,7 +102,7 @@ def mega_get(
     """ Download a file at the above URL or remote path to the above local
     path. """
     local_path_obj = Path(local_path)
-    if local_path_obj.exists():
+    if local_path_obj.exists() and not local_path_obj.is_dir():
         if not quiet:
             print(local_path+" already exists.")
         return GetReturnCode.PRESENT

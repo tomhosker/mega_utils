@@ -95,3 +95,14 @@ def test_mega_get(run_mock):
     run_mock.return_value = False
     result = mega_get("here", path_to_local_test_file)
     assert result == GetReturnCode.FAILURE
+    # Test correct behaviour when local path is directory.
+    run_mock.return_value = True
+    path_to_local_test_folder = "local_test_folder"
+    path_obj_to_local_test_folder = Path(path_to_local_test_folder)
+    shutil.rmtree(path_to_local_test_folder, ignore_errors=True)
+    result = mega_get("here", path_to_local_test_folder, quiet=False)
+    assert result == GetReturnCode.SUCCESS
+    path_obj_to_local_test_folder.mkdir()
+    result = mega_get("here", path_to_local_test_folder)
+    assert result == GetReturnCode.SUCCESS
+    shutil.rmtree(path_to_local_test_folder)
